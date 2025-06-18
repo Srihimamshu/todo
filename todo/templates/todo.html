@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To Do</title>
+    <link rel="stylesheet" href="{% static 'css/todo.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap"
+    />
+    <script
+      src="https://kit.fontawesome.com/cb792c0850.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <main class="container">
+      <div class="inner-box">
+        <h1 class="greeting">Hello {{ user }}</h1>
+      </div>
+
+      <div class="heading">To Do</div>
+
+      <div class="to-do-box">
+        <!-- Sign Out -->
+        <div class="signout">
+          <a href="{% url 'signout' %}" class="sign">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </a>
+        </div>
+
+        <!-- Task Input Form -->
+        <form method="POST" action="{% url 'todo' %}">
+          {% csrf_token %}
+          <input
+            type="text"
+            class="input-task"
+            name="task_name"
+            required
+            placeholder="Add Task"
+          />
+          <input
+            type="text"
+            class="input-description"
+            name="description"
+            placeholder="Description (optional)"
+          />
+          <select name="category" class="task-category" required>
+            <option value="" disabled selected hidden>Choose Category</option>
+            <option value="personal">Personal</option>
+            <option value="work">Work</option>
+            <option value="academic">Academic</option>
+            <option value="health">Health</option>
+            <option value="social">Social</option>
+            <option value="errands">Errands</option>
+            <option value="misc">Miscellaneous</option>
+          </select>
+          <input
+            type="date"
+            class="due-date"
+            name="due_date"
+            placeholder="Due Date"
+          />
+          <input type="button" class="submit-btn" value="Add Task" />
+        </form>
+      </div>
+
+      <!-- Category-Based Columns -->
+      <div class="categories-grid">
+        {% for category, task_list in category_groups.items %}
+        <div class="category-column">
+          <h4 class="category-title">{{ category|title }}</h4>
+          {% for task in task_list %}
+          <div class="to-do">
+            <h5>{{ task.task_name }}</h5>
+            {% if task.description %}
+            <p>{{ task.description }}</p>
+            {% endif %} {% if task.due_date %}
+            <p>{{ task.due_date|date:"Y-m-d" }}</p>
+            {% endif %}
+            <div class="actions">
+              <a href="{% url 'edit_todo' task.sno %}" aria-label="Edit Task">
+                <i class="fa-regular fa-pen-to-square"></i>
+              </a>
+
+              <a href="{% url 'delete_todo' task.sno %}" aria-label="Delete Task">
+                <i class="fa-regular fa-trash-can"></i>
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </main>
+  </body>
+</html>
